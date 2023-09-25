@@ -2,7 +2,7 @@ import User from "../model/user.model.js";
 import Message from "../model/chat.model.js";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
-import { response } from "express";
+
 
 export const signUp = async (req, res, next) => {
     try {
@@ -49,8 +49,10 @@ export const tokenVerify = (req, res, next) => {
     }
 };
 export const reciveMassage = async (request, response, next) => {
+    console.log(request.body)
     try {
         const messages = await Message.find().sort('-createdAt');
+  
         console.log(messages)
         return response.status(200).json({ massage: "Massage recive sucessfully", status: true });
     } catch (error) {
@@ -59,7 +61,7 @@ export const reciveMassage = async (request, response, next) => {
 };
 export const sendMassage = async (request, response, next) => {
     const { textmassage,sender,receiver } = request.body;
-    console.log(request.body)
+    console.log(request.body);
     try {
         const message = new Message({ textmassage,sender,receiver });
         await message.save();
@@ -84,3 +86,19 @@ export const CurrentUser = async (req, res, next) => {
         return res.status(500).json({ error: "Internal server error", status: false })
     }
 }
+export const fatchMassage= async (req, res,next) => {
+    try {
+      const { receiverId, senderId } = req.query;
+      const messages = await Message.find({
+        $or: [
+          { sender: senderId, receiver: receiverId },
+          { sender: receiverId, receiver: senderId },
+        ],
+      });
+      res.json({ messages });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+  

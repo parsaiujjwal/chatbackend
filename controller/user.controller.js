@@ -2,22 +2,40 @@ import User from "../model/user.model.js";
 import Message from "../model/chat.model.js";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
+import multer from "multer";
 
 
-export const signUp = async (req, res, next) => {
-    try {
-        console.log(req.body)
-        const { firstName, lastName, email, password } = req.body;
-        req.body.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
-        let user = await User.create({
-            firstName, lastName, email, password: req.body.password,
-        });
-        return res.status(200).json({ user: user, message: 'Sign up success', status: true });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: 'Internal Server Error', status: false });
-    }
-};
+
+// export const signUp = async (req, res, next) => {
+//     console.log(req.body)
+//     try {
+//         const fileType = file.originalname.split('.').pop();
+//         const NewFileName = 'thumbnail-' + Date.now() + '.' + fileType;
+//         const thumbnailFile = NewFileName;
+//         const { firstName, lastName, email, password } = req.body;
+//         req.body.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
+
+//         let user = await User.create({firstName,lastName,email,password: req.body.password,thumbnail: thumbnailFile,});
+//         return res.status(200).json({ user: user, message: 'Sign up success', status: true });
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json({ message: 'Internal Server Error', status: false });
+//     }
+// };
+// export const signUp = async (req, res, next) => {
+//     try {
+//         console.log(req.body)
+//         const { firstName, lastName, email, password } = req.body;
+//         req.body.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
+//         let user = await User.create({
+//             firstName:firstName, lastName:lastName, email:email, password: req.body.password,
+//         });
+//         return res.status(200).json({ user: user, message: 'Sign up success', status: true });
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json({ message: 'Internal Server Error', status: false });
+//     }
+// };
 
 export const signIn = async (req, res, next) => {
     try {
@@ -52,7 +70,7 @@ export const reciveMassage = async (request, response, next) => {
     console.log(request.body)
     try {
         const messages = await Message.find().sort('-createdAt');
-  
+
         console.log(messages)
         return response.status(200).json({ massage: "Massage recive sucessfully", status: true });
     } catch (error) {
@@ -60,10 +78,10 @@ export const reciveMassage = async (request, response, next) => {
     }
 };
 export const sendMassage = async (request, response, next) => {
-    const { textmassage,sender,receiver } = request.body;
+    const { textmassage, sender, receiver } = request.body;
     console.log(request.body);
     try {
-        const message = new Message({ textmassage,sender,receiver });
+        const message = new Message({ textmassage, sender, receiver });
         await message.save();
         return response.status(200).json({ massage: "Massage Sent Sucessfully" });
     } catch (error) {
@@ -86,19 +104,39 @@ export const CurrentUser = async (req, res, next) => {
         return res.status(500).json({ error: "Internal server error", status: false })
     }
 }
-export const fatchMassage= async (req, res,next) => {
+export const fatchMassage = async (req, res, next) => {
     try {
-      const { receiverId, senderId } = req.query;
-      const messages = await Message.find({
-        $or: [
-          { sender: senderId, receiver: receiverId },
-          { sender: receiverId, receiver: senderId },
-        ],
-      });
-      res.json({ messages });
+        const { receiverId, senderId } = req.query;
+        const messages = await Message.find({
+            $or: [
+                { sender: senderId, receiver: receiverId },
+                { sender: receiverId, receiver: senderId },
+            ],
+        });
+        res.json({ messages });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-  };
-  
+};
+export const signUp = async (req, res, next) => {
+    console.log(req.body)
+    try {
+        var file = req.file.originalname;
+        console.log(file)
+        const fileType = file.split('.').pop();
+        const NewFileName = 'thumbnail-' + Date.now() + '.' + fileType;
+        const thumbnailFile = NewFileName;
+        console.log(thumbnailFile)
+        const { firstName, lastName, email, password } = req.body;
+        req.body.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
+        let user = await User.create({
+            thumbnailFile:thumbnailFile,firstName: firstName, lastName: lastName, email: email, password: req.body.password
+        });
+        return res.status(200).json({ user: user, message: 'Sign up success', status: true });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Internal Server Error', status: false });
+    }
+};
+    

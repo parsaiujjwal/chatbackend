@@ -17,6 +17,9 @@ const NewUserSchema = mongoose.Schema(
             type: String,
             require:true,   
         },
+        thumbnailFile:{
+            type:String,
+        }
     }
 )
 const User = mongoose.model('newuser', NewUserSchema);

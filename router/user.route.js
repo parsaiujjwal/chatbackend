@@ -1,12 +1,26 @@
-import express from "express";
-import { signIn, signUp } from "../controller/user.controller.js";
-import multer from "multer";
-const uploads = multer({ dest: 'public/images' })
-const route = express.Router();
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import  { getImage }  from '../controller/getfile.js'; 
 
-    route.post("/signup",
-    uploads.single("thumbnailFile"), signUp),
-    route.post("/signIn", signIn);
+import { signUp, signIn } from '../controller/user.controller.js';
 
+const router = express.Router();
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null,'./public');
+    },
+    filename: (req, file, cb) => {
+        const fileType = file.originalname.split('.').pop();
+        const newFileName = 'thumbnail-' + Date.now() + '.' + fileType;
+        cb(null, newFileName);
+    },
+});
 
-export default route;
+const upload = multer({ storage: storage });
+
+router.post('/signup', upload.single('thumbnailFile'), signUp);
+router.get('/public/:thumbnail', getImage); 
+router.post('/signin', signIn);
+
+export default router;

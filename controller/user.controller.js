@@ -3,39 +3,27 @@ import Message from "../model/chat.model.js";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
 import multer from "multer";
-
-
-
-// export const signUp = async (req, res, next) => {
-//     console.log(req.body)
-//     try {
-//         const fileType = file.originalname.split('.').pop();
-//         const NewFileName = 'thumbnail-' + Date.now() + '.' + fileType;
-//         const thumbnailFile = NewFileName;
-//         const { firstName, lastName, email, password } = req.body;
-//         req.body.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
-
-//         let user = await User.create({firstName,lastName,email,password: req.body.password,thumbnail: thumbnailFile,});
-//         return res.status(200).json({ user: user, message: 'Sign up success', status: true });
-//     } catch (error) {
-//         console.log(error);
-//         return res.status(500).json({ message: 'Internal Server Error', status: false });
-//     }
-// };
-// export const signUp = async (req, res, next) => {
-//     try {
-//         console.log(req.body)
-//         const { firstName, lastName, email, password } = req.body;
-//         req.body.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
-//         let user = await User.create({
-//             firstName:firstName, lastName:lastName, email:email, password: req.body.password,
-//         });
-//         return res.status(200).json({ user: user, message: 'Sign up success', status: true });
-//     } catch (error) {
-//         console.log(error);
-//         return res.status(500).json({ message: 'Internal Server Error', status: false });
-//     }
-// };
+export const signUp = async (req, res, next) => {
+    try {
+        console.log(req.body)
+        
+        var file = req.file.filename;
+        console.log(file)
+        const { firstName, lastName, email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt(10));
+        const user = await User.create({
+            thumbnailFile:file,
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+        });
+        return res.status(200).json({ user, message: 'Sign up success', status: true });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error', status: false });
+    }
+};
 
 export const signIn = async (req, res, next) => {
     try {
@@ -119,24 +107,3 @@ export const fatchMassage = async (req, res, next) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-export const signUp = async (req, res, next) => {
-    console.log(req.body)
-    try {
-        var file = req.file.originalname;
-        console.log(file)
-        const fileType = file.split('.').pop();
-        const NewFileName = 'thumbnail-' + Date.now() + '.' + fileType;
-        const thumbnailFile = NewFileName;
-        console.log(thumbnailFile)
-        const { firstName, lastName, email, password } = req.body;
-        req.body.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
-        let user = await User.create({
-            thumbnailFile:thumbnailFile,firstName: firstName, lastName: lastName, email: email, password: req.body.password
-        });
-        return res.status(200).json({ user: user, message: 'Sign up success', status: true });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: 'Internal Server Error', status: false });
-    }
-};
-    
